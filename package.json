@@ -1,0 +1,9 @@
+{
+  "name": "ethan",
+  "private": true,
+  "description": "ETHAN — tests des modules JavaScript purs (node:test, sans dépendance)",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test \"tests/js/*.test.js\""
+  }
+}

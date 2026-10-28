@@ -1,0 +1,4 @@
+# Le vhost doit pointer sur public/. Si le projet est servi depuis sa racine (XAMPP sans vhost),
+# tout est refusé ici ; seul public/ (qui rétablit l'accès dans son propre .htaccess) reste joignable.
+# Protège .env, storage/, vendor/, database/…
+Require all denied

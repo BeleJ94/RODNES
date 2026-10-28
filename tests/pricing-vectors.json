@@ -1,0 +1,31 @@
+{
+  "_comment": "Jeu de valeurs partagé : PricingTest (PHP) et eth-pricing.test.js doivent donner exactement les mêmes résultats.",
+  "lineAmount": [
+    { "qtyMilli": 12000, "unitMinor": 4599, "expected": 55188 },
+    { "qtyMilli": 2500, "unitMinor": 1999, "expected": 4998 },
+    { "qtyMilli": 333, "unitMinor": 150, "expected": 50 },
+    { "qtyMilli": 1, "unitMinor": 499, "expected": 0 },
+    { "qtyMilli": 1, "unitMinor": 500, "expected": 1 }
+  ],
+  "marginBp": [
+    { "cost": 8000, "price": 10000, "expected": 2000 },
+    { "cost": 10000, "price": 8000, "expected": -2500 },
+    { "cost": 6667, "price": 10000, "expected": 3333 },
+    { "cost": 100, "price": 0, "expected": null }
+  ],
+  "priceForMargin": [
+    { "cost": 8000, "marginBp": 2000, "expected": 10000 },
+    { "cost": 1000, "marginBp": 1500, "expected": 1177 },
+    { "cost": 54795, "marginBp": 2000, "expected": 68494 },
+    { "cost": 0, "marginBp": 2000, "expected": 0 }
+  ],
+  "totals": {
+    "lines": [
+      { "quantityMilli": 10000, "unitCostMinor": 8000, "unitPriceMinor": 10000 },
+      { "quantityMilli": 2500, "unitCostMinor": 1999, "unitPriceMinor": 2599 }
+    ],
+    "vatRateBp": 1600,
+    "withVat": { "cost": 84998, "subtotal": 106498, "vat": 17040, "total": 123538, "margin": 21500, "marginBp": 2019 },
+    "withoutVat": { "vat": 0, "total": 106498 }
+  }
+}
