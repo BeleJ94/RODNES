@@ -15,6 +15,8 @@ final class CurrentUser
         public readonly Role $role,
         public readonly string $locale,
         private readonly array $permissions,
+        /** Mot de passe provisoire (création, réinitialisation) : à changer avant tout autre écran. */
+        public readonly bool $mustChangePassword = false,
     ) {
     }
 

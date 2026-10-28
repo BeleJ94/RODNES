@@ -130,6 +130,7 @@ final class Auth
             $role,
             (string) $row['locale'],
             $this->permissions->forRole($role),
+            (bool) ($row['must_change_password'] ?? false),
         );
     }
 }

@@ -94,8 +94,10 @@ $menu = require BASE_PATH . '/config/menu.php';
           </div>
         </div>
         <div class="user-chip">
-          <span class="avatar" aria-hidden="true"><?= e($user?->initials()) ?></span>
-          <span class="user-chip__text"><strong><?= e($user?->name) ?></strong><small><?= e($user ? t($user->role->labelKey()) : '') ?></small></span>
+          <a class="user-chip__link" href="<?= e(url('/account')) ?>" title="<?= e(t('account.title')) ?>">
+            <span class="avatar" aria-hidden="true"><?= e($user?->initials()) ?></span>
+            <span class="user-chip__text"><strong><?= e($user?->name) ?></strong><small><?= e($user ? t($user->role->labelKey()) : '') ?></small></span>
+          </a>
           <form method="post" action="<?= e(url('/logout')) ?>">
             <?= csrf_field() ?>
             <button type="submit" class="icon-btn" aria-label="<?= e(t('auth.logout')) ?>" title="<?= e(t('auth.logout')) ?>"><?= icon('log-out') ?></button>

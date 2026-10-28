@@ -336,3 +336,68 @@ function doc_logo(): string
     $logo = company_logo_data_uri();
     return $logo === '' ? '' : '<img src="' . e($logo) . '" alt="' . e(setting('company_name')) . '" class="doc__logo">';
 }
+
+/** Libellé d'un type d'entité du journal d'activité (le code brut si non traduit). */
+function activity_entity_label(string $type): string
+{
+    $label = t('activity.entity.' . $type);
+    return $label === 'activity.entity.' . $type ? $type : $label;
+}
+
+/** Libellé d'une action du journal d'activité (le code brut si non traduit). */
+function activity_action_label(string $action): string
+{
+    $label = t('history.action.' . $action);
+    return $label === 'history.action.' . $action ? str_replace('_', ' ', $action) : $label;
+}
+
+/**
+ * Détail « avant → après » d'une entrée du journal, valeurs lisibles et abrégées.
+ *
+ * @return list<array{field: string, from: string, to: string}>
+ */
+function activity_changes(?string $json): array
+{
+    $changes = $json !== null && $json !== '' ? json_decode($json, true) : null;
+    if (!is_array($changes)) {
+        return [];
+    }
+    $show = static function (mixed $v): string {
+        if ($v === null || $v === '') {
+            return '—';
+        }
+        $v = is_scalar($v) ? (string) $v : (string) json_encode($v, JSON_UNESCAPED_UNICODE);
+        return mb_strlen($v) > 120 ? mb_substr($v, 0, 119) . '…' : $v;
+    };
+    $out = [];
+    foreach ($changes as $field => $change) {
+        $label = t('activity.field.' . $field);
+        $out[] = [
+            'field' => $label === 'activity.field.' . $field ? str_replace('_', ' ', (string) $field) : $label,
+            'from' => $show(is_array($change) && array_key_exists('from', $change) ? $change['from'] : null),
+            'to' => $show(is_array($change) && array_key_exists('to', $change) ? $change['to'] : $change),
+        ];
+    }
+    return $out;
+}
+
+/** Initiales d'un nom (« Jean Kabila » → « JK »), pour les pastilles d'utilisateur. */
+function user_initials(string $name): string
+{
+    $initials = '';
+    foreach (array_slice(preg_split('/\s+/u', trim($name)) ?: [], 0, 2) as $part) {
+        $initials .= mb_strtoupper(mb_substr($part, 0, 1));
+    }
+    return $initials !== '' ? $initials : '?';
+}
+
+/** Teinte d'une action du journal : création, suppression/annulation, sécurité, ou neutre. */
+function activity_action_tone(string $action): string
+{
+    return match (true) {
+        in_array($action, ['created', 'activated', 'login', 'approve', 'accept', 'issue', 'confirm', 'pod', 'delivered'], true) => 'ok',
+        in_array($action, ['deleted', 'cancel', 'deactivated', 'decline', 'reject_approval', 'sessions_revoked'], true) => 'bad',
+        in_array($action, ['password_reset', 'password_changed', 'logout'], true) => 'security',
+        default => 'neutral',
+    };
+}

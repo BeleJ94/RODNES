@@ -2792,8 +2792,54 @@ field(row, 'margin').addEventListener('input', () => {
   }
 
   /** Composants de la page (contenu principal) : rejoués après chaque rafraîchissement AJAX. */
+  /** [data-copy] : copie le texte du [data-copy-source] voisin (mot de passe provisoire). */
+  function initCopyButtons() {
+    document.querySelectorAll('[data-copy]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const source = btn.parentElement.querySelector('[data-copy-source]');
+        if (!source) {
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(source.textContent.trim());
+        } catch (e) {
+          window.getSelection().selectAllChildren(source); // copie manuelle (contexte non sécurisé)
+          return;
+        }
+        const label = btn.querySelector('span');
+        const original = label.textContent;
+        label.textContent = btn.dataset.copiedLabel || original;
+        window.setTimeout(() => { label.textContent = original; }, 2000);
+      });
+    });
+  }
+
+  /** form[data-pw-form] : règles du nouveau mot de passe cochées au fil de la saisie. */
+  function initPasswordRules() {
+    document.querySelectorAll('form[data-pw-form]').forEach((form) => {
+      const input = form.querySelector('[data-pw-new]');
+      const confirm = form.querySelector('[data-pw-confirm]');
+      const rules = form.querySelector('[data-pw-rules]');
+      if (!input || !confirm || !rules) {
+        return;
+      }
+      const min = Number(input.getAttribute('minlength') || 12);
+      const update = () => {
+        const v = input.value;
+        const classes = [/[a-z]/, /[A-Z]/, /\d/, /[^A-Za-z0-9]/].filter((re) => re.test(v)).length;
+        const state = { length: v.length >= min, mix: classes >= 3, match: v !== '' && v === confirm.value };
+        rules.querySelectorAll('[data-rule]').forEach((li) => li.classList.toggle('is-ok', state[li.dataset.rule]));
+        confirm.setCustomValidity(confirm.value !== '' && !state.match ? (rules.querySelector('[data-rule="match"] span').textContent) : '');
+      };
+      input.addEventListener('input', update);
+      confirm.addEventListener('input', update);
+    });
+  }
+
   function initPage() {
     initPasswordToggle();
+    initCopyButtons();
+    initPasswordRules();
     initTables();
     initStaticTables();
     initAutoSubmit();

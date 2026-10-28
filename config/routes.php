@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Controllers\AccountController;
 use App\Controllers\AccountingExportController;
+use App\Controllers\ActivityController;
+use App\Controllers\UserController;
 use App\Controllers\AuthController;
 use App\Controllers\ClientController;
 use App\Controllers\ClientOrderController;
@@ -169,6 +172,25 @@ return static function (Router $r): void {
     $r->post('/settings/company', [SettingsController::class, 'saveCompany'], 'settings.company');
     $r->get('/settings/currencies', [SettingsController::class, 'currencies'], 'settings.currencies');
     $r->post('/settings/currencies/rates', [SettingsController::class, 'saveRate'], 'settings.currencies');
+
+    // Utilisateurs et journal d'activité
+    $r->get('/settings/users', [UserController::class, 'index'], 'settings.users');
+    $r->get('/settings/users/new', [UserController::class, 'create'], 'settings.users');
+    $r->post('/settings/users', [UserController::class, 'store'], 'settings.users');
+    $r->get('/settings/users/{id:\d+}', [UserController::class, 'show'], 'settings.users');
+    $r->get('/settings/users/{id:\d+}/edit', [UserController::class, 'edit'], 'settings.users');
+    $r->post('/settings/users/{id:\d+}', [UserController::class, 'update'], 'settings.users');
+    $r->post('/settings/users/{id:\d+}/activate', [UserController::class, 'activate'], 'settings.users');
+    $r->post('/settings/users/{id:\d+}/deactivate', [UserController::class, 'deactivate'], 'settings.users');
+    $r->post('/settings/users/{id:\d+}/reset-password', [UserController::class, 'resetPassword'], 'settings.users');
+    $r->post('/settings/users/{id:\d+}/revoke-sessions', [UserController::class, 'revokeSessions'], 'settings.users');
+    $r->get('/settings/activity', [ActivityController::class, 'index'], 'activity.view');
+
+    // Mon compte (tout utilisateur connecté)
+    $r->get('/account', [AccountController::class, 'show']);
+    $r->post('/account', [AccountController::class, 'update']);
+    $r->get('/account/password', [AccountController::class, 'password']);
+    $r->post('/account/password', [AccountController::class, 'changePassword']);
 
     // Modules des phases suivantes (docs/ARCHITECTURE.md §9) : page d'attente explicite, mêmes permissions.
     foreach (require BASE_PATH . '/config/menu.php' as $section) {

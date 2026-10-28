@@ -9,10 +9,11 @@ use App\Core\Response;
 use App\Core\Session;
 use App\Security\Auth;
 use App\Security\LoginResult;
+use App\Services\ActivityLogger;
 
 final class AuthController extends Controller
 {
-    public function __construct(private Auth $auth, private Session $session)
+    public function __construct(private Auth $auth, private Session $session, private ActivityLogger $logger)
     {
     }
 
@@ -34,11 +35,19 @@ final class AuthController extends Controller
             $this->session->flash('_old', ['email' => $email]);
             return Response::redirect(url('/login'));
         }
+        $user = $this->auth->user();
+        if ($user !== null) {
+            $this->logger->log('auth', $user->id, 'login');
+        }
         return Response::redirect(url(safe_path($this->session->pull('_intended'))));
     }
 
     public function logout(Request $request): Response
     {
+        $user = $this->auth->user();
+        if ($user !== null) {
+            $this->logger->log('auth', $user->id, 'logout');
+        }
         $this->auth->logout();
         return Response::redirect(url('/login'));
     }

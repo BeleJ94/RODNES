@@ -86,6 +86,10 @@ final class Router
             }
             return Response::redirect(url('/login'));
         }
+        // Mot de passe provisoire : seul l'écran de changement (et la déconnexion) reste accessible.
+        if ($user !== null && $user->mustChangePassword && !in_array($request->path, ['/account/password', '/logout', '/locale'], true)) {
+            return Response::redirect(url('/account/password'));
+        }
         if ($route['perm'] !== null && !($user?->can($route['perm']) ?? false)) {
             throw new HttpException(403);
         }
